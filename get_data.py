@@ -21,6 +21,7 @@ all_quality = ['exp', 'pred']
 
 
 def download_set(loc, domain, complete, quality, dataset):
+    print('Downloading %s %s %s %s set...' % (domain, complete, quality, dataset))
     url = 'https://www.uniprot.org/uploadlists/'
     query = [line.rstrip('\n') for line in
              gzip.open('%s/%s_%s_%s/%s_ids.txt.gz' % (loc, domain, complete, quality, dataset), 'rt')]
