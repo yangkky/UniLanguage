@@ -62,6 +62,7 @@ def download_set(loc, domain, complete, quality, dataset):
 
         i += 1
     formated_file.close()
+    print()
 
 
 if args.all:
