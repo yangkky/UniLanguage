@@ -2,6 +2,7 @@ import argparse
 import gzip
 import urllib.parse
 import urllib.request
+import subprocess
 
 parser = argparse.ArgumentParser(description='Download the protein datasets')
 parser.add_argument('--data', type=str, default='data/', help='location of the data ids')
@@ -29,9 +30,11 @@ def download_set(loc, domain, complete, quality, dataset):
     n_total = len(query)
 
     n = 3000
-    formated_file = open('%s/%s_%s_%s/%s.txt' % (loc, domain, complete, quality, dataset), 'w')
-
-    i = 0
+    fname = '%s/%s_%s_%s/%s.txt' % (loc, domain, complete, quality, dataset)
+    formated_file = open(fname, 'a')
+    # See how long file is already and jump ahead if necessary
+    current_length = int(subprocess.check_output('wc -l < ' + fname, shell=True)[:-1])
+    i = current_length // n
     while i * n < n_total:
         tmp_query = query[i * n:i * n + n]
         tmp_query = ' '.join(tmp_query)
@@ -58,10 +61,10 @@ def download_set(loc, domain, complete, quality, dataset):
                     line = line.decode('utf-8').strip().split('\t')
                     seq = ''.join(list(line[0]))
                     formated_file.write('%s\n' % seq)
+            i += 1
         except urllib.error.HTTPError:
             attempt += 1
 
-        i += 1
     formated_file.close()
     print()
 
