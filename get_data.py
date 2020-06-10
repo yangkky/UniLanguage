@@ -5,6 +5,8 @@ import urllib.request
 import subprocess
 import multiprocessing
 
+import numpy as np
+
 parser = argparse.ArgumentParser(description='Download the protein datasets')
 parser.add_argument('--data', type=str, default='data/', help='location of the data ids')
 parser.add_argument('--domain', choices=['euk', 'bac', 'arc', 'vir'], default='euk',
@@ -35,7 +37,7 @@ def download_set(loc, domain, complete, quality, dataset):
     formated_file = open(fname, 'a')
     # See how long file is already and jump ahead if necessary
     current_length = int(subprocess.check_output('wc -l < ' + fname, shell=True)[:-1])
-    i = current_length // n
+    i = int(np.ceil(current_length / n))
     while i * n < n_total:
         tmp_query = query[i * n:i * n + n]
         tmp_query = ' '.join(tmp_query)
@@ -83,7 +85,8 @@ if args.all:
                 f_args.append((args.data, domain, complete, 'exp', 'valid'))
                 f_args.append((args.data, domain, complete, 'exp', 'test'))
     with multiprocessing.Pool(n_proc) as pool:
-        pool.starmap(download_set, f_args)
+        result = pool.starmap_async(download_set, f_args)
+        result.get()
 
 
 else:
